@@ -53,7 +53,7 @@ def get_local_world_size() -> int:
     Returns:
         int: The local world size.
     """
-    return int(os.environ.get('LOCAL_WORLD_SIZE', 1))
+    return int(os.environ.get('NUMS_GPU', 1))
 
 
 def barrier() -> None:

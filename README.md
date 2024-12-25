@@ -49,6 +49,13 @@
 </p>
 <br />
 
+# 🚨 Warning
+
+This is a fork of the MosaicML StreamingDataset library. It is not yet ready for production use.
+
+* To make sure it works with pytorch lightning, we have use a `NUMS_GPU` environment variable to replace the `LOCAL_WORLD_SIZE` environment variable.
+* Whether you store your data on local or remote, we use `remote` to pass in the path of your data. The local temp directory will be removed by default. You can set `remove_local_cache=False` to keep it.
+
 # 👋 Welcome
 
 We built StreamingDataset to make training on large datasets from cloud storage as fast, cheap, and scalable as possible.

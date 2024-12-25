@@ -99,7 +99,8 @@ class Stream:
                  download_retry: Optional[int] = None,
                  download_timeout: Optional[float] = None,
                  validate_hash: Optional[str] = None,
-                 keep_zip: Optional[bool] = None) -> None:
+                 keep_zip: Optional[bool] = None,
+                 remove_local_cache: bool = True) -> None:
         self.remote = remote
         self._local = local
         self.split = split or ''
@@ -143,8 +144,10 @@ class Stream:
 
         self.validate_hash = validate_hash
 
+        self._remove_local_cache = remove_local_cache
+
         if local is None:
-            self.local = self._get_temporary_directory()
+            self.local = self._get_temporary_directory(remove_local_cache=self._remove_local_cache)
             if get_local_rank() == 0:
                 if os.path.exists(self.local):
                     raise FileExistsError(
@@ -164,13 +167,18 @@ class Stream:
 
         self._downloader = CloudDownloader.get(remote)
 
-    def _get_temporary_directory(self) -> str:
+    def _get_temporary_directory(self, remove_local_cache: bool = True) -> str:
         """Construct a path to a temporary directory based on remote and split."""
         root = tempfile.gettempdir()
         hash = ''
         if self.remote is not None:
             hash = hashlib.blake2s(self.remote.encode('utf-8'), digest_size=16).hexdigest()
-        return os.path.join(root, hash, self.split)
+
+        local_temp_dir = os.path.join(root, hash, self.split)
+        if os.path.exists(local_temp_dir) and remove_local_cache:
+            import shutil
+            shutil.rmtree(local_temp_dir)
+        return local_temp_dir
 
     def apply_default(self, default: dict) -> None:
         """Apply defaults, setting any unset fields.

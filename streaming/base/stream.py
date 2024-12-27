@@ -176,8 +176,7 @@ class Stream:
 
         local_temp_dir = os.path.join(root, hash, self.split)
         if os.path.exists(local_temp_dir) and remove_local_cache:
-            import shutil
-            shutil.rmtree(local_temp_dir)
+            os.system(f"rm -rf {local_temp_dir}")
         return local_temp_dir
 
     def apply_default(self, default: dict) -> None:
